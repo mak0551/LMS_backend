@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
+import userRouter from "./routes/user.js";
 
 const connetWithRetry = () => {
   return mongoose
@@ -21,5 +22,6 @@ app.listen(process.env.PORT, () => {
   console.log(`server listening on port ${process.env.PORT}`);
 });
 
-app.get("/", (req, res) => res.status(200).send("Home"));
+app.use("/users", userRouter);
 
+app.get("/", (req, res) => res.status(200).send("Home"));
