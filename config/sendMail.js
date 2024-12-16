@@ -74,9 +74,48 @@ export const mailSend = async (toEmail, subject, body) => {
   }
 };
 
-export const sendEmailOtp = async (email, otp, fullName) => {
+export const sendEmailVerificationOtp = async (email, otp, fullName) => {
   try {
     const subject = "your one time passcode to verify email";
+    const body = `<div class="container">
+        <h1>Learning Management System</h1>
+        <p>Hello, ${fullName}!</p>
+        <p>Your One-Time Password (OTP) to verify your email is:</p>
+        <div class="otp">${otp}</div>
+        <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
+        <p>If you did not request this OTP, please ignore this email or contact support.</p>
+        <div class="footer">
+            © 2024 Learning Management System. All rights reserved.
+        </div>
+    </div>`;
+    await mailSend(email, subject, body);
+  } catch (err) {
+    console.log("error sending email", err);
+  }
+};
+
+export const emailOtpVerified = async (email, fullName) => {
+  try {
+    const subject = "email verified successfully";
+    const body = `<div class="container">
+        <h1>Learning Management System</h1>
+        <p>Hello, ${fullName}!</p>
+        <p>Your email ${email} is verified successfully</p>
+        <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
+        <p>Incase you didn't requested to verify , please contact support.</p>
+        <div class="footer">
+            © 2024 Learning Management System. All rights reserved.
+        </div>
+    </div>`;
+    await mailSend(email, subject, body);
+  } catch (err) {
+    console.log("error sending email");
+  }
+};
+
+export const sendLoginOtp = async (email, otp, fullName) => {
+  try {
+    const subject = "your one time passcode for logging in";
     const body = `<div class="container">
         <h1>Learning Management System</h1>
         <p>Hello, ${fullName}!</p>
@@ -94,18 +133,19 @@ export const sendEmailOtp = async (email, otp, fullName) => {
   }
 };
 
-export const otpVerified = async (email, fullName) => {
+export const loginSuccessful = async (email, fullName) => {
   try {
+    const subject = "login successful";
     const body = `<div class="container">
         <h1>Learning Management System</h1>
         <p>Hello, ${fullName}!</p>
-        <p>Your email ${email} is verified successfully</p>
-        <p>This OTP is valid for 10 minutes. Please do not share it with anyone.</p>
-        <p>Incase you didn't requested to verify , please contact support.</p>
+        <p>You have successfully logged into your account </p>
+        <p>Incase this is not you, please contact support.</p>
         <div class="footer">
             © 2024 Learning Management System. All rights reserved.
         </div>
     </div>`;
+    await mailSend(email, subject, body);
   } catch (err) {
     console.log("error sending email");
   }
