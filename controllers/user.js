@@ -9,6 +9,7 @@ import {
 } from "../config/sendMail.js";
 import user from "../models/user.js";
 
+// register user
 export const addUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -52,6 +53,7 @@ export const addUser = async (req, res) => {
   }
 };
 
+// verify user email
 export const verifyEmail = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -109,6 +111,7 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
+// resend otp for email verification
 export const resendOtpEmail = async (req, res) => {
   try {
     const { email } = req.body;
@@ -138,6 +141,7 @@ export const resendOtpEmail = async (req, res) => {
   }
 };
 
+// login user
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -173,6 +177,7 @@ export const login = async (req, res) => {
   }
 };
 
+// verify otp to login
 export const verifyLogin = async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -236,6 +241,23 @@ export const verifyLogin = async (req, res) => {
     res
       .status(200)
       .json({ message: "otp verified successfully", token, user: User });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", message: err.message });
+  }
+};
+
+// update user
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+    const updatedUser = await user.findByIdAndUpdate(id, body, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(updatedUser);
   } catch (err) {
     res
       .status(500)
