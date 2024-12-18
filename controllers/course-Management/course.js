@@ -101,3 +101,18 @@ export const getCoursesByTeacher = async (req, res) => {
       .json({ error: "internal server error", message: err.message });
   }
 };
+
+export const getCoursesByLevel = async (req, res) => {
+  try {
+    const { level } = req.body;
+    const findCourse = await course.find({ level: level });
+    if (findCourse.length === 0) {
+      return res.status(404).json({ message: "No courses found" });
+    }
+    return res.status(200).json(findCourse);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", message: err.message });
+  }
+};

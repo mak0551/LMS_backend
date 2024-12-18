@@ -7,7 +7,7 @@ const courseSchema = new mongoose.Schema(
     teacher: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     priorcourses: { type: mongoose.Schema.Types.ObjectId, ref: "course" },
     skillsRequired: { type: String },
-    level: { type: String, enum: ["beginner, intermediate, advanced"] },
+    level: { type: String, enum: ["Beginner, Intermediate, Advanced"] },
     duration: {
       hours: { type: Number, default: 0 },
       minutes: { type: Number, default: 0 },
