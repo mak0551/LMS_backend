@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import userRouter from "./routes/user.js";
+import course from "./routes/course.js"
 
 const connetWithRetry = () => {
   return mongoose
@@ -23,5 +24,6 @@ app.listen(process.env.PORT, () => {
 });
 
 app.use("/users", userRouter);
+app.use("/course", course)
 
 app.get("/", (req, res) => res.status(200).send("Home"));
