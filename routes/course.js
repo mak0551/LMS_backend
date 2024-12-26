@@ -12,16 +12,16 @@ const router = express.Router();
 
 router.post("/create", createCourse);
 
-router.post("/get", getCourse);
+router.get("/getbyid/:id", getCourse);
 
-router.post("/getall", getAllCourses);
+router.get("/getall", getAllCourses);
 
-router.post("/getbyteacher", getCoursesByTeacher);
+router.get("/getbyteacher/:id", getCoursesByTeacher);
 
-router.post("/getbylvl", getCoursesByLevel);
+router.get("/getbylvl", getCoursesByLevel);
 
-router.post("/update", updateCourse);
+router.put("/update/:id", updateCourse);
 
-router.post("/delete", deleteCourse);
+router.delete("/delete/:id", deleteCourse);
 
 export default router;

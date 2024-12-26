@@ -49,6 +49,42 @@ export const getAllCourses = async (req, res) => {
   }
 };
 
+export const getCoursesByTeacher = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const findTeacher = await user.findById(id).populate("courses");
+    if (!findTeacher) {
+      return res.status(404).json({ message: "teacher not found" });
+    }
+    console.log(findTeacher);
+    if (!findTeacher.courses || findTeacher.courses.length === 0) {
+      return res.status(404).json({
+        message: "No courses found for this teacher",
+      });
+    }
+    res.status(200).json(findTeacher.courses);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "internal server error", message: err.message });
+  }
+};
+
+export const getCoursesByLevel = async (req, res) => {
+  try {
+    const { level } = req.body;
+    const findCourse = await course.find({ level: level });
+    if (findCourse.length === 0) {
+      return res.status(404).json({ message: "No courses found" });
+    }
+    return res.status(200).json(findCourse);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", message: err.message });
+  }
+};
+
 export const updateCourse = async (req, res) => {
   try {
     const { id } = req.params;
@@ -79,37 +115,13 @@ export const deleteCourse = async (req, res) => {
         .json({ message: "no course found with the provided ID to delete" });
     }
     await course.findByIdAndDelete(id);
+    const updateuser = await user.findOneAndUpdate(
+      { _id : findCourse.teacher },
+      { $pull: { courses: id } },
+      { new: true }
+    );
+    console.log(updateuser)
     return res.status(200).json({ message: "deleted successfully" });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: "Internal server error", message: err.message });
-  }
-};
-
-export const getCoursesByTeacher = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const findTeacher = await user.findById(id).populate("courses");
-    if (!findTeacher) {
-      return res.status(404).json({ message: "teacher not found" });
-    }
-    res.status(200).json(findTeacher.courses);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: "internal server error", message: err.message });
-  }
-};
-
-export const getCoursesByLevel = async (req, res) => {
-  try {
-    const { level } = req.body;
-    const findCourse = await course.find({ level: level });
-    if (findCourse.length === 0) {
-      return res.status(404).json({ message: "No courses found" });
-    }
-    return res.status(200).json(findCourse);
   } catch (err) {
     res
       .status(500)

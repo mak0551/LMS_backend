@@ -1,10 +1,11 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 import userRouter from "./routes/user.js";
-import course from "./routes/course.js"
+import course from "./routes/course.js";
 
 const connetWithRetry = () => {
   return mongoose
@@ -18,12 +19,13 @@ const connetWithRetry = () => {
 connetWithRetry();
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.listen(process.env.PORT, () => {
   console.log(`server listening on port ${process.env.PORT}`);
 });
 
 app.use("/users", userRouter);
-app.use("/course", course)
+app.use("/course", course);
 
 app.get("/", (req, res) => res.status(200).send("Home"));

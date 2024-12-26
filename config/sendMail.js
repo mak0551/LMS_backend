@@ -150,3 +150,22 @@ export const loginSuccessful = async (email, fullName) => {
     console.log("error sending email");
   }
 };
+
+export const forgotPasswordEmail = async (email, otp, fullName) => {
+  try {
+    const subject = "forgot password email";
+    const body = `<div class="container">
+        <h1>Learning Management System</h1>
+        <p>Hello, ${fullName}!</p>
+        <p>Your OTP to reset your password </p>
+        <div class="otp">${otp}</div>
+        <p>Incase this is not you, please don't share this Otp to anyone .</p>
+        <div class="footer">
+            © 2024 Learning Management System. All rights reserved.
+        </div>
+    </div>`;
+    await mailSend(email, subject, body);
+  } catch (err) {
+    console.log("error sending email", err);
+  }
+};
