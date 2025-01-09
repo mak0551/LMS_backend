@@ -1,4 +1,4 @@
-import { course } from "../../models/course.js";
+import { course } from "../../models/course-Management/course.js";
 import user from "../../models/user.js";
 
 export const createCourse = async (req, res) => {
@@ -116,11 +116,11 @@ export const deleteCourse = async (req, res) => {
     }
     await course.findByIdAndDelete(id);
     const updateuser = await user.findOneAndUpdate(
-      { _id : findCourse.teacher },
+      { _id: findCourse.teacher },
       { $pull: { courses: id } },
       { new: true }
     );
-    console.log(updateuser)
+    console.log(updateuser);
     return res.status(200).json({ message: "deleted successfully" });
   } catch (err) {
     res
