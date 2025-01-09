@@ -7,7 +7,7 @@ import {
   getCoursesByLevel,
   getCoursesByTeacher,
   updateCourse,
-} from "../controllers/course-Management/course.js";
+} from "../../controllers/course-Management/course.js";
 const router = express.Router();
 
 router.post("/create", createCourse);

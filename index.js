@@ -5,7 +5,8 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 
 import userRouter from "./routes/user.js";
-import course from "./routes/course.js";
+import course from "./routes/course-Management/course.js";
+import module from "./routes/course-Management/module.js";
 
 const connetWithRetry = () => {
   return mongoose
@@ -27,5 +28,6 @@ app.listen(process.env.PORT, () => {
 
 app.use("/users", userRouter);
 app.use("/course", course);
+app.use("/module", module);
 
 app.get("/", (req, res) => res.status(200).send("Home"));
