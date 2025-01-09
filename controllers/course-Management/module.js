@@ -12,7 +12,8 @@ export const createModule = async (req, res) => {
     const newModule = await module.create(body);
     res.status(200).json(newModule);
   } catch (err) {
-    res.status(500)
+    res
+      .status(500)
       .json({ error: "internal server error", message: err.message });
   }
 };
@@ -33,7 +34,7 @@ export const getModules = async (req, res) => {
 
 export const getSingleModule = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     const modules = await module.findById(id);
     if (!modules) {
       return res.status(404).json({ message: "no records found" });
@@ -48,7 +49,7 @@ export const getSingleModule = async (req, res) => {
 
 export const updateModule = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     const body = req.body;
     const updatedModule = await module.findByIdAndUpdate(id, body, {
       new: true,
@@ -66,7 +67,7 @@ export const updateModule = async (req, res) => {
 
 export const deleteModule = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     const deleteModule = await module.findByIdAndDelete(id);
     if (!deleteModule) {
       return res.status(404).json({ message: "no module found to delete" });

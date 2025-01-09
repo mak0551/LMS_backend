@@ -10,12 +10,12 @@ const router = express.Router();
 
 router.post("/add", createModule);
 
-router.get("/getone", getModules);
+router.get("/getall", getModules);
 
-router.get("/getall", getSingleModule);
+router.get("/getone/:id", getSingleModule);
 
-router.put("/update", updateModule);
+router.put("/update/:id", updateModule);
 
-router.delete("/delete", deleteModule);
+router.delete("/delete/:id", deleteModule);
 
 export default router;
