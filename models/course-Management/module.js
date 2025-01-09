@@ -7,7 +7,7 @@ const contentSchema = new mongoose.Schema({
     enum: ["video", "pdf", "quiz"], // Types of content allowed
     required: true,
   },
-  url: { type: String, required: true }, // URL to access the content (e.g., video link, PDF storage path)
+  url: { type: String }, // URL to access the content (e.g., video link, PDF storage path)
   duration: { type: Number }, // Duration in minutes (optional, for videos)
 });
 
@@ -15,7 +15,7 @@ const moduleSchema = new mongoose.Schema(
   {
     title: { type: String, required: true }, // Module/Chapter name
     description: { type: String, required: true }, // Brief description
-    contents: [contentSchema], // Array of contents (e.g., videos, PDFs)
+    content: [contentSchema], // Array of contents (e.g., videos, PDFs)
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "course",

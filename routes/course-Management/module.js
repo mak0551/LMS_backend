@@ -5,10 +5,10 @@ import {
   getModules,
   getSingleModule,
   updateModule,
-} from "../../controllers/course-Management/module";
+} from "../../controllers/course-Management/module.js";
 const router = express.Router();
 
-router.create("/add", createModule);
+router.post("/add", createModule);
 
 router.get("/getone", getModules);
 

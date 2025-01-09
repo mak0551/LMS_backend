@@ -1,7 +1,7 @@
-import { course } from "../../models/course-Management/course";
-import { module } from "../../models/course-Management/module";
+import { course } from "../../models/course-Management/course.js";
+import { module } from "../../models/course-Management/module.js";
 
-export const createModule = async () => {
+export const createModule = async (req, res) => {
   try {
     const body = req.body;
     const { courseId } = req.body;
@@ -12,8 +12,7 @@ export const createModule = async () => {
     const newModule = await module.create(body);
     res.status(200).json(newModule);
   } catch (err) {
-    res
-      .status(500)
+    res.status(500)
       .json({ error: "internal server error", message: err.message });
   }
 };

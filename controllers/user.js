@@ -9,7 +9,7 @@ import {
   sendLoginOtp,
 } from "../config/sendMail.js";
 import user from "../models/user.js";
-import { course } from "../models/course.js";
+import { course } from "../models/course-Management/course.js";
 
 // register user
 export const addUser = async (req, res) => {
