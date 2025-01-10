@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+const videoSchema = new mongoose.Schema({
+  title: { type: String, required: true }, // Video title
+  url: { type: String, required: true }, // Storage URL (e.g., Firebase, AWS S3)
+  duration: { type: Number, required: true }, // Duration in minutes
+});
+
 const courseSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
@@ -12,6 +18,7 @@ const courseSchema = new mongoose.Schema(
     priorcourses: { type: mongoose.Schema.Types.ObjectId, ref: "course" },
     skillsRequired: [{ type: String }],
     level: { type: String, enum: ["Beginner", "Intermediate", "Advanced"] },
+    videos: [videoSchema], // Array of videos
     duration: {
       hours: { type: Number, default: 0 },
       minutes: { type: Number, default: 0 },
