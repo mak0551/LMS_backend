@@ -1,8 +1,8 @@
-import { enrollMent } from "../../models/course-Management/enrollment";
+import { enrollMent } from "../../models/course-Management/enrollment.js";
 
-export const createEnrollment = async (requestAnimationFrame, res) => {
+export const createEnrollment = async (req, res) => {
   try {
-    const { body } = req.body;
+    const body = req.body;
     const newEnrollment = await enrollMent.create(body);
     res.status(200).json(newEnrollment);
   } catch (err) {

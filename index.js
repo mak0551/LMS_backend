@@ -7,6 +7,7 @@ dotenv.config();
 import userRouter from "./routes/user.js";
 import course from "./routes/course-Management/course.js";
 import module from "./routes/course-Management/module.js";
+import enrollment from "./routes/course-Management/enrollment.js";
 
 const connetWithRetry = () => {
   return mongoose
@@ -29,5 +30,6 @@ app.listen(process.env.PORT, () => {
 app.use("/users", userRouter);
 app.use("/course", course);
 app.use("/module", module);
+app.use("/enrollment", enrollment)
 
 app.get("/", (req, res) => res.status(200).send("Home"));
