@@ -4,6 +4,11 @@ import user from "../../models/user.js";
 export const createCourse = async (req, res) => {
   try {
     const body = req.body;
+    const findTeacher = await user.findById(body.teacher);
+    console.log(findTeacher, body.teacher);
+    if (findTeacher.role !== "admin" && findTeacher.role !== "teacher") {
+      return res.status(400).json({ message: "teacher not found" });
+    }
     const newCourse = await course.create(body);
     await user.findByIdAndUpdate(
       newCourse.teacher,
