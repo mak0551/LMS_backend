@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 dotenv.config();
@@ -20,6 +21,7 @@ const connetWithRetry = () => {
 };
 connetWithRetry();
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
@@ -30,6 +32,6 @@ app.listen(process.env.PORT, () => {
 app.use("/users", userRouter);
 app.use("/course", course);
 app.use("/module", module);
-app.use("/enrollment", enrollment)
+app.use("/enrollment", enrollment);
 
 app.get("/", (req, res) => res.status(200).send("Home"));
