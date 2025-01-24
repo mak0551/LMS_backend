@@ -19,6 +19,7 @@ const courseSchema = new mongoose.Schema(
     skillsRequired: [{ type: String }],
     level: { type: String, enum: ["Beginner", "Intermediate", "Advanced"] },
     videos: [videoSchema], // Array of videos
+    thumbNail: { type: String },
     duration: {
       hours: { type: Number, default: 0 },
       minutes: { type: Number, default: 0 },

@@ -42,7 +42,7 @@ export const getCourse = async (req, res) => {
 
 export const getAllCourses = async (req, res) => {
   try {
-    const findCourse = await course.find({});
+    const findCourse = await course.find({}).populate('teacher');
     if (findCourse.length === 0) {
       return res.status(404).json({ message: "No records found" });
     }
