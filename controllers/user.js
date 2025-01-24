@@ -157,21 +157,40 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "invalid password" });
     }
 
-    // generating otp
-    let OTP = Math.floor(Math.random() * 900000) + 100000;
-    // add otp to the otp model
-    let otp = new UserOTP({
-      email: email,
-      otp: OTP,
-      createdAt: new Date(),
-      expireAt: new Date(Date.now() + 86400000),
-    });
-    await otp.save();
-    // calling send mail function
-    await sendLoginOtp(email, OTP, User.name);
-    res.status(200).json({
-      message: `otp has successfully sent to ${email} please verify to login`,
-    });
+    // // generating otp
+    // let OTP = Math.floor(Math.random() * 900000) + 100000;
+    // // add otp to the otp model
+    // let otp = new UserOTP({
+    //   email: email,
+    //   otp: OTP,
+    //   createdAt: new Date(),
+    //   expireAt: new Date(Date.now() + 86400000),
+    // });
+    // await otp.save();
+    // // calling send mail function
+    // await sendLoginOtp(email, OTP, User.name);
+    // res.status(200).json({
+    //   message: `otp has successfully sent to ${email} please verify to login`,
+    // });
+
+    // Generating JWT token
+    const token = jwt.sign(
+      {
+        id: User._id,
+        email: User.email,
+        role: User.role,
+      },
+      process.env.JWT_SECRET
+    );
+
+    //set token as Cookie
+    res.cookie("accessToken", token, { httpOnly: true });
+
+    await loginSuccessful(email, User.name);
+
+    res
+      .status(200)
+      .json({ message: "login successful", token, user: User });
   } catch (err) {
     res
       .status(500)
