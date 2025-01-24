@@ -28,7 +28,7 @@ export const createCourse = async (req, res) => {
 export const getCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    const findCourse = await course.findById(id);
+    const findCourse = await course.findById(id).populate("teacher");
     if (!findCourse) {
       return res.status(404).json({ message: "No records found" });
     }
