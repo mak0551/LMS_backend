@@ -10,6 +10,11 @@ export const createModule = async (req, res) => {
       return res.status(404).json({ message: "no course found" });
     }
     const newModule = await module.create(body);
+    await course.findByIdAndUpdate(
+      courseId,
+      { $push: { module: newModule.id } },
+      { new: true }
+    );
     res.status(200).json(newModule);
   } catch (err) {
     res

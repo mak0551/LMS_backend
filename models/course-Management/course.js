@@ -18,7 +18,7 @@ const courseSchema = new mongoose.Schema(
     priorcourses: { type: mongoose.Schema.Types.ObjectId, ref: "course" },
     skillsRequired: [{ type: String }],
     level: { type: String, enum: ["Beginner", "Intermediate", "Advanced"] },
-    videos: [videoSchema], // Array of videos
+    module: [{ type: mongoose.Schema.Types.ObjectId, ref: "module" }],
     thumbNail: { type: String },
     duration: {
       hours: { type: Number, default: 0 },
