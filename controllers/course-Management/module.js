@@ -73,6 +73,12 @@ export const updateModule = async (req, res) => {
 export const deleteModule = async (req, res) => {
   try {
     const { id } = req.params;
+    const findModule = await module.findById(id);
+    await course.findByIdAndUpdate(
+      findModule.courseId,
+      { $pull: { module: id } },
+      { new: true }
+    );
     const deleteModule = await module.findByIdAndDelete(id);
     if (!deleteModule) {
       return res.status(404).json({ message: "no module found to delete" });
