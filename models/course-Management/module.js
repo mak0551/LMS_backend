@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const contentSchema = new mongoose.Schema({
   title: { type: String, required: true }, // Title of the content (e.g., "Introduction Video")
+  description: { type: String, required: true }, // Brief description
   type: {
     type: String,
     enum: ["video", "pdf", "quiz"], // Types of content allowed
@@ -14,7 +15,6 @@ const contentSchema = new mongoose.Schema({
 const moduleSchema = new mongoose.Schema(
   {
     title: { type: String, required: true }, // Module/Chapter name
-    description: { type: String, required: true }, // Brief description
     content: [contentSchema], // Array of contents (e.g., videos, PDFs)
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
