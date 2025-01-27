@@ -476,9 +476,11 @@ export const getUserById = async (req, res) => {
 
 export const getAllTeachers = async (req, res) => {
   try {
-    const getTeachers = await user.find({
-      courses: { $exists: true, $ne: [] },
-    });
+    const getTeachers = await user
+      .find({
+        courses: { $exists: true, $ne: [] },
+      })
+      .populate("courses");
     if (getTeachers.length === 0) {
       return res.status(404).json({ message: "no records found" });
     }

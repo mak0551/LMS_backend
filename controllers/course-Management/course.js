@@ -5,9 +5,12 @@ export const createCourse = async (req, res) => {
   try {
     const body = req.body;
     const findTeacher = await user.findById(body.teacher);
-    console.log(findTeacher, body.teacher);
-    if (findTeacher.role !== "admin" && findTeacher.role !== "teacher") {
-      return res.status(400).json({ message: "teacher not found" });
+    // console.log(findTeacher, body.teacher);
+    // if (findTeacher.role !== "admin" && findTeacher.role !== "teacher") {
+    //   return res.status(400).json({ message: "teacher not found" });
+    // }
+    if (!findTeacher) {
+      return res.status(404).json({ message: "no records found" });
     }
     const newCourse = await course.create(body);
     await user.findByIdAndUpdate(
@@ -42,7 +45,7 @@ export const getCourse = async (req, res) => {
 
 export const getAllCourses = async (req, res) => {
   try {
-    const findCourse = await course.find({}).populate('teacher');
+    const findCourse = await course.find({}).populate("teacher");
     if (findCourse.length === 0) {
       return res.status(404).json({ message: "No records found" });
     }
