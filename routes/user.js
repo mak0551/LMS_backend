@@ -3,6 +3,7 @@ import {
   addUser,
   deleteUser,
   forgotPassword,
+  getAllTeachers,
   getAllUsers,
   getUserById,
   login,
@@ -29,7 +30,7 @@ router.post("/forgotpassword", forgotPassword);
 
 router.post("/verifyotp", verifyOtp);
 
-router.post("/resetpassword", resetPassword)
+router.post("/resetpassword", resetPassword);
 
 router.put("/update/:id", updateUser);
 
@@ -38,5 +39,7 @@ router.delete("/delete/:id", deleteUser);
 router.get("/getall", getAllUsers);
 
 router.get("/getbyid/:id", getUserById);
+
+router.get("/getallteachers", getAllTeachers);
 
 export default router;

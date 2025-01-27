@@ -188,9 +188,7 @@ export const login = async (req, res) => {
 
     await loginSuccessful(email, User.name);
 
-    res
-      .status(200)
-      .json({ message: "login successful", token, user: User });
+    res.status(200).json({ message: "login successful", token, user: User });
   } catch (err) {
     res
       .status(500)
@@ -473,5 +471,21 @@ export const getUserById = async (req, res) => {
     res
       .status(500)
       .json({ error: "Internal server error", message: err.message });
+  }
+};
+
+export const getAllTeachers = async (req, res) => {
+  try {
+    const getTeachers = await user.find({
+      courses: { $exists: true, $ne: [] },
+    });
+    if (getTeachers.length === 0) {
+      return res.status(404).json({ message: "no records found" });
+    }
+    res.status(200).json(getTeachers);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "internal server error", error: err.message });
   }
 };
