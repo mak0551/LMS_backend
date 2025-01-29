@@ -19,7 +19,11 @@ const courseSchema = new mongoose.Schema(
     skillsRequired: [{ type: String }],
     level: { type: String, enum: ["Beginner", "Intermediate", "Advanced"] },
     module: [{ type: mongoose.Schema.Types.ObjectId, ref: "module" }],
-    thumbNail: { type: String },
+    thumbNail: {
+      type: String,
+      default:
+        "https://www.incimages.com/uploaded_files/image/1920x1080/getty_933383882_2000133420009280345_410292.jpg",
+    },
     duration: {
       hours: { type: Number, default: 0 },
       minutes: { type: Number, default: 0 },
