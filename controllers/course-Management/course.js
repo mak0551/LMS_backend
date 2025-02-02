@@ -22,6 +22,7 @@ export const createCourse = async (req, res) => {
     );
     res.status(200).json(newCourse);
   } catch (err) {
+    console.error("Server Error:", err); // Log backend error
     res
       .status(500)
       .json({ error: "Internal server error", message: err.message });
