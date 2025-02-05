@@ -9,6 +9,7 @@ import userRouter from "./routes/user.js";
 import course from "./routes/course-Management/course.js";
 import module from "./routes/course-Management/module.js";
 import enrollment from "./routes/course-Management/enrollment.js";
+import fileUpload from "./routes/course-Management/upload.js";
 
 const connetWithRetry = () => {
   return mongoose
@@ -33,5 +34,6 @@ app.use("/users", userRouter);
 app.use("/course", course);
 app.use("/module", module);
 app.use("/enrollment", enrollment);
+app.use("/file", fileUpload);
 
 app.get("/", (req, res) => res.status(200).send("Home"));
