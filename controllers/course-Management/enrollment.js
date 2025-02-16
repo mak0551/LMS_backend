@@ -20,9 +20,15 @@ export const createEnrollment = async (req, res) => {
     if (existingEnrollment)
       return res.status(400).json({ message: "User already enrolled" });
 
+    await course.findByIdAndUpdate(
+      courseId,
+      { $push: { enrolledBy: studentId } },
+      { new: true }
+    );
+
     const newEnrollment = await enrollMent.create({
-      user: userId,
-      course: courseId,
+      courseId: courseId,
+      studentId: studentId,
     });
 
     res.status(200).json({
@@ -87,9 +93,15 @@ export const removeEnrollment = async (req, res) => {
   try {
     const { courseId, studentId } = req.body;
 
+    await course.findByIdAndUpdate(
+      courseId,
+      { $pull: { enrolledBy: studentId } },
+      { new: true }
+    );
+
     const enrollment = await enrollMent.findOneAndDelete({
-      studentId: studentId,
       courseId: courseId,
+      studentId: studentId,
     });
 
     if (!enrollment)

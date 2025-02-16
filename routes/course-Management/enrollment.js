@@ -17,6 +17,6 @@ router.get("/getbyid/:id", getEnrollmentById);
 
 router.put("/update/:id", updateEnrollment);
 
-router.delete("/delete/:id", removeEnrollment);
+router.delete("/delete", removeEnrollment);
 
 export default router;
