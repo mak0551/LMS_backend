@@ -19,6 +19,7 @@ const courseSchema = new mongoose.Schema(
     skillsRequired: [{ type: String }],
     level: { type: String, enum: ["Beginner", "Intermediate", "Advanced"] },
     module: [{ type: mongoose.Schema.Types.ObjectId, ref: "module" }],
+    enrolledBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
     thumbNail: {
       type: String,
       default:

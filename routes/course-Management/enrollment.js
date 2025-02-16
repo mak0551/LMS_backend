@@ -1,8 +1,8 @@
 import {
   createEnrollment,
-  deleteEnrollment,
   getEnrollmentById,
   getEnrollments,
+  removeEnrollment,
   updateEnrollment,
 } from "../../controllers/course-Management/enrollment.js";
 import express from "express";
@@ -17,6 +17,6 @@ router.get("/getbyid/:id", getEnrollmentById);
 
 router.put("/update/:id", updateEnrollment);
 
-router.delete("/delete/:id", deleteEnrollment);
+router.delete("/delete/:id", removeEnrollment);
 
 export default router;
