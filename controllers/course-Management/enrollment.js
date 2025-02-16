@@ -114,3 +114,24 @@ export const removeEnrollment = async (req, res) => {
       .json({ message: "internal Server error", error: error.message });
   }
 };
+
+export const checkEnrollment = async (req, res) => {
+  try {
+    const { courseId, studentId } = req.query;
+
+    if (!courseId || !studentId) {
+      return res.status(400).json({ message: "Missing courseId or studentId" });
+    }
+
+    const existingEnrollment = await enrollMent.findOne({
+      courseId: courseId,
+      studentId: studentId,
+    });
+
+    res.status(200).json({ isEnrolled: !!existingEnrollment });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "internal Server error", error: error.message });
+  }
+};

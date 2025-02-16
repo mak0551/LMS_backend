@@ -11,7 +11,7 @@ const enrollMentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: true,
-      unique: true,
+      // unique: true,
     },
     enrollMentDate: { type: Date, default: Date.now },
     status: {

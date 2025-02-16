@@ -1,4 +1,5 @@
 import {
+  checkEnrollment,
   createEnrollment,
   getEnrollmentById,
   getEnrollments,
@@ -18,5 +19,7 @@ router.get("/getbyid/:id", getEnrollmentById);
 router.put("/update/:id", updateEnrollment);
 
 router.delete("/delete", removeEnrollment);
+
+router.get("/check", checkEnrollment);
 
 export default router;
