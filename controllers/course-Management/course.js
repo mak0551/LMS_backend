@@ -22,7 +22,7 @@ export const createCourse = async (req, res) => {
     );
     res.status(200).json(newCourse);
   } catch (err) {
-    console.error("Server Error:", err); // Log backend error
+    // console.error("Server Error:", err); // Log backend error
     res
       .status(500)
       .json({ error: "Internal server error", message: err.message });
@@ -65,7 +65,7 @@ export const getCoursesByTeacher = async (req, res) => {
     if (!findTeacher) {
       return res.status(404).json({ message: "teacher not found" });
     }
-    console.log(findTeacher);
+    // console.log(findTeacher);
     if (!findTeacher.courses || findTeacher.courses.length === 0) {
       return res.status(404).json({
         message: "No courses found for this teacher",
@@ -129,7 +129,7 @@ export const deleteCourse = async (req, res) => {
       { $pull: { courses: id } },
       { new: true }
     );
-    console.log(updateuser);
+    // console.log(updateuser);
     return res.status(200).json({ message: "deleted successfully" });
   } catch (err) {
     res

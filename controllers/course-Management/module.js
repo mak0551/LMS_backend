@@ -17,7 +17,7 @@ export const createModule = async (req, res) => {
     );
     res.status(200).json(newModule);
   } catch (err) {
-    console.error("Server Error:", err); // Log backend error
+    // console.error("Server Error:", err); // Log backend error
     res
       .status(500)
       .json({ error: "internal server error", message: err.message });

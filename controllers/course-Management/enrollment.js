@@ -135,3 +135,24 @@ export const checkEnrollment = async (req, res) => {
       .json({ message: "internal Server error", error: error.message });
   }
 };
+
+export const getEnroolledCourses = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const findUser = await user.findById(id);
+
+    if (!findUser) return res.status(404).json({ message: "user not found" });
+
+    const getCourses = await enrollMent.find({ studentId: id });
+
+    if (getCourses.length < 1) {
+      return res.status(404).json({ message: "not enrolled in any courses" });
+    }
+
+    res.status(200).json(getCourses);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "internal server error", message: err.message });
+  }
+};
