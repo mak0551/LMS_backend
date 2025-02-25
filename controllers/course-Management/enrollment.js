@@ -143,7 +143,13 @@ export const getEnroolledCourses = async (req, res) => {
 
     if (!findUser) return res.status(404).json({ message: "user not found" });
 
-    const getCourses = await enrollMent.find({ studentId: id });
+    const getCourses = await enrollMent.find({ studentId: id }).populate({
+      path: "courseId",
+      populate: {
+        path: "teacher",
+        select: "name profileImg"
+      },
+    });
 
     if (getCourses.length < 1) {
       return res.status(404).json({ message: "not enrolled in any courses" });
