@@ -1,4 +1,5 @@
 import { course } from "../../models/course-Management/course.js";
+import { module } from "../../models/course-Management/module.js";
 import user from "../../models/user.js";
 
 export const createCourse = async (req, res) => {
@@ -123,13 +124,15 @@ export const deleteCourse = async (req, res) => {
         .status(404)
         .json({ message: "no course found with the provided ID to delete" });
     }
-    await course.findByIdAndDelete(id);
-    const updateuser = await user.findOneAndUpdate(
+
+    await user.findOneAndUpdate(
       { _id: findCourse.teacher },
       { $pull: { courses: id } },
       { new: true }
     );
-    // console.log(updateuser);
+    await module.deleteMany({ courseId: findCourse._id });
+    await course.findByIdAndDelete(id);
+
     return res.status(200).json({ message: "deleted successfully" });
   } catch (err) {
     res

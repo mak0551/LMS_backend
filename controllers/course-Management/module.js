@@ -53,6 +53,22 @@ export const getSingleModule = async (req, res) => {
   }
 };
 
+export const getModuleByCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const findCourse = await course.findById(id);
+    if (!findCourse)
+      return res.status(404).json({ message: "course not found" });
+    const findModule = await module.find({ courseId: findCourse._id });
+    if (findModule.length < 1) {
+      return res.status(404).json({ message: "no modules found" });
+    }
+    res.status(200).json(findModule);
+  } catch (err) {
+    res.status(500).json({ error: "internal server error" });
+  }
+};
+
 export const updateModule = async (req, res) => {
   try {
     const { id } = req.params;

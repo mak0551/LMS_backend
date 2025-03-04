@@ -2,6 +2,7 @@ import express from "express";
 import {
   createModule,
   deleteModule,
+  getModuleByCourse,
   getModules,
   getSingleModule,
   updateModule,
@@ -13,6 +14,8 @@ router.post("/add", createModule);
 router.get("/getall", getModules);
 
 router.get("/getone/:id", getSingleModule);
+
+router.get("/getbycourse/:id", getModuleByCourse);
 
 router.put("/update/:id", updateModule);
 
