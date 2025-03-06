@@ -56,7 +56,10 @@ export const deleteReview = async (req, res) => {
     const findReview = await review.findById(id);
     const findCourse = await course.findById(findReview.courseId);
 
-    if (findReview.userId !== userId && findCourse.teacher !== userId) {
+    if (
+      findReview.userId.toString() !== userId &&
+      findCourse.teacher.toString() !== userId
+    ) {
       return res.status(400).json({
         message: `you can't delete this review because its not yours`,
       });

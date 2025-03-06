@@ -83,7 +83,7 @@ export const getCoursesByTeacher = async (req, res) => {
 export const getCoursesByLevel = async (req, res) => {
   try {
     const { level } = req.body;
-    const findCourse = await course.find({ level: level });
+    const findCourse = await course.find({ level: level }).populate("reviews");
     if (findCourse.length === 0) {
       return res.status(404).json({ message: "No courses found" });
     }
