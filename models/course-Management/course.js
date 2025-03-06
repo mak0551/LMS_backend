@@ -20,6 +20,7 @@ const courseSchema = new mongoose.Schema(
     level: { type: String, enum: ["Beginner", "Intermediate", "Advanced"] },
     module: [{ type: mongoose.Schema.Types.ObjectId, ref: "module" }],
     enrolledBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "review" }],
     thumbNail: {
       type: String,
       default:
