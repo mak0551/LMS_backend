@@ -77,7 +77,7 @@ export const getAllCourses = async (req, res) => {
 
     const courseWithRatings = findCourse.map((course) => ({
       ...course.toObject(),
-      averageRating: ratingsMap.get(course._id.toString() || "0.00"),
+      averageRating: ratingsMap.get(course._id.toString()) || "0.00",
     }));
 
     return res.status(200).json(courseWithRatings);
@@ -95,13 +95,29 @@ export const getCoursesByTeacher = async (req, res) => {
     if (!findTeacher) {
       return res.status(404).json({ message: "teacher not found" });
     }
-    // console.log(findTeacher);
     if (!findTeacher.courses || findTeacher.courses.length === 0) {
       return res.status(404).json({
         message: "No courses found for this teacher",
       });
     }
-    res.status(200).json(findTeacher.courses);
+
+    const ids = findTeacher.courses.map((e) => e._id);
+
+    const result = await review.aggregate([
+      { $match: { courseId: { $in: ids } } },
+      { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
+    ]);
+
+    const ratingMap = new Map(
+      result.map((e) => [e._id.toString(), e.averageRating.toFixed(2)])
+    );
+
+    const finalResult = findTeacher.courses.map((course) => ({
+      ...course.toObject(),
+      averageRating: ratingMap.get(course._id.toString()) || "0.00",
+    }));
+
+    res.status(200).json(finalResult);
   } catch (err) {
     res
       .status(500)
@@ -112,11 +128,27 @@ export const getCoursesByTeacher = async (req, res) => {
 export const getCoursesByLevel = async (req, res) => {
   try {
     const { level } = req.body;
-    const findCourse = await course.find({ level: level }).populate("reviews");
+    const findCourse = await course.find({ level: level });
     if (findCourse.length === 0) {
       return res.status(404).json({ message: "No courses found" });
     }
-    return res.status(200).json(findCourse);
+    const ids = findCourse.map((e) => e._id);
+
+    const result = await review.aggregate([
+      { $match: { courseId: { $in: ids } } },
+      { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
+    ]);
+
+    const ratingMap = new Map(
+      result.map((e) => [e._id.toString(), e.averageRating.toFixed(2)])
+    );
+
+    const finalResult = findCourse.map((course) => ({
+      ...course.toObject(),
+      averageRating: ratingMap.get(course._id.toString()) || "0.00",
+    }));
+
+    return res.status(200).json(finalResult);
   } catch (err) {
     res
       .status(500)
