@@ -1,6 +1,7 @@
 import { course } from "../../models/course-Management/course.js";
 import { module } from "../../models/course-Management/module.js";
 import { review } from "../../models/reviews.js";
+import { enrollMent } from "../../models/course-Management/enrollment.js";
 import user from "../../models/user.js";
 
 export const createCourse = async (req, res) => {
@@ -191,6 +192,7 @@ export const deleteCourse = async (req, res) => {
       { $pull: { courses: id } },
       { new: true }
     );
+    await enrollMent.deleteMany({ courseId: findCourse._id });
     await module.deleteMany({ courseId: findCourse._id });
     await course.findByIdAndDelete(id);
 
