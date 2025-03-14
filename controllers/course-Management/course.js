@@ -3,6 +3,7 @@ import { module } from "../../models/course-Management/module.js";
 import { review } from "../../models/reviews.js";
 import { enrollMent } from "../../models/course-Management/enrollment.js";
 import user from "../../models/user.js";
+import { populate } from "dotenv";
 
 export const createCourse = async (req, res) => {
   try {
@@ -92,7 +93,9 @@ export const getAllCourses = async (req, res) => {
 export const getCoursesByTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-    const findTeacher = await user.findById(id).populate("courses");
+    const findTeacher = await user
+      .findById(id)
+      .populate({ path: "courses", populate: { path: "enrolledBy" } });
     if (!findTeacher) {
       return res.status(404).json({ message: "teacher not found" });
     }
