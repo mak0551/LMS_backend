@@ -93,9 +93,16 @@ export const getAllCourses = async (req, res) => {
 export const getCoursesByTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-    const findTeacher = await user
-      .findById(id)
-      .populate({ path: "courses", populate: { path: "enrolledBy reviews" } });
+    const findTeacher = await user.findById(id).populate({
+      path: "courses",
+      populate: [
+        { path: "enrolledBy" },
+        {
+          path: "reviews",
+          populate: { path: "userId", select: "name" },
+        },
+      ],
+    });
     if (!findTeacher) {
       return res.status(404).json({ message: "teacher not found" });
     }
