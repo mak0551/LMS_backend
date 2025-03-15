@@ -95,7 +95,7 @@ export const getCoursesByTeacher = async (req, res) => {
     const { id } = req.params;
     const findTeacher = await user
       .findById(id)
-      .populate({ path: "courses", populate: { path: "enrolledBy" } });
+      .populate({ path: "courses", populate: { path: "enrolledBy reviews" } });
     if (!findTeacher) {
       return res.status(404).json({ message: "teacher not found" });
     }
