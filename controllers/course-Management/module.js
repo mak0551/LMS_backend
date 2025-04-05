@@ -4,15 +4,15 @@ import { module } from "../../models/course-Management/module.js";
 export const createModule = async (req, res) => {
   try {
     const body = req.body;
-    const { courseId } = req.body;
-    const findCourse = await course.findById(courseId);
-    if (!findCourse) {
+    const courseId = body.map((e) => e.courseId);
+    const findCourse = await course.find({ _id: { $in: courseId } });
+    if (findCourse.length < 1) {
       return res.status(404).json({ message: "no course found" });
     }
     const newModule = await module.create(body);
     await course.findByIdAndUpdate(
       courseId,
-      { $push: { module: newModule.id } },
+      { $push: { module: { $each: courseId } } },
       { new: true }
     );
     res.status(200).json(newModule);
