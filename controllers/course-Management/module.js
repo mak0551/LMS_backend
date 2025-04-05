@@ -10,9 +10,10 @@ export const createModule = async (req, res) => {
       return res.status(404).json({ message: "no course found" });
     }
     const newModule = await module.create(body);
+    const moduleIds = newModule.map((e) => e._id);
     await course.findByIdAndUpdate(
       courseId,
-      { $push: { module: { $each: courseId } } },
+      { $push: { module: { $each: moduleIds } } },
       { new: true }
     );
     res.status(200).json(newModule);
