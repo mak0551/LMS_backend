@@ -7,7 +7,7 @@ import {
   loginSuccessful,
   sendEmailVerificationOtp,
   sendLoginOtp,
-} from "../config/sendMail.js";
+} from "../services/sendMail.js";
 import user from "../models/user.js";
 import { course } from "../models/course-Management/course.js";
 
