@@ -1,4 +1,3 @@
-import { UserOTP } from "../models/otp.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import {
@@ -8,15 +7,25 @@ import {
   sendEmailVerificationOtp,
   sendLoginOtp,
 } from "../services/sendMail.js";
-import user from "../models/user.js";
-import { course } from "../models/course-Management/course.js";
+import {
+  findAllUsers,
+  findOneUser,
+  findUserById,
+  findAllTeachers,
+  createUser,
+  updateUserData,
+  deleteUserById,
+  createOtp,
+  findOtpByEmail,
+  deleteOtpByEmail,
+} from "../repositories/user.js";
 
 // register user
 export const addUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const existingUser = await user.findOne({ email }); // Check if the email already exists
+    const existingUser = await findOneUser({ email }); // Check if the email already exists
     if (existingUser) {
       return res.status(409).json({ message: "Email already exists" });
     }
@@ -24,21 +33,16 @@ export const addUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10); // hashing the password
 
     // Creating user
-    const newUser = await user.create({
+    const newUser = await createUser({
       ...req.body,
       password: hashedPassword,
     });
 
     // generating otp
     let OTP = Math.floor(Math.random() * 900000) + 100000;
+
     // add otp to the otp model
-    let otp = new UserOTP({
-      email: email,
-      otp: OTP,
-      createdAt: new Date(),
-      expireAt: new Date(Date.now() + 86400000),
-    });
-    await otp.save();
+    await createOtp(email, OTP);
 
     // calling send mail function
     await sendEmailVerificationOtp(email, OTP, newUser.name);
@@ -61,7 +65,7 @@ export const verifyEmail = async (req, res) => {
     const { email, otp } = req.body;
 
     // finding user
-    const User = await user.findOne({ email });
+    const User = await findOneUser({ email });
     if (!User) {
       return res
         .status(404)
@@ -74,8 +78,8 @@ export const verifyEmail = async (req, res) => {
     }
 
     // finding otp according to user email
-    const getOtp = await UserOTP.find({ email });
-    if (!getOtp.length === 0) {
+    const getOtp = await findOtpByEmail(email);
+    if (!getOtp) {
       return res.status(404).json({ message: "No OTP records found" });
     }
 
@@ -90,14 +94,12 @@ export const verifyEmail = async (req, res) => {
 
     // check if the time difference is more than 15 minutes (900,000 milliseconds)
     if (timeDifference > 9000000) {
-      await UserOTP.deleteMany({ email: email }); // Delete OTP records for the user's email
+      await deleteOtpByEmail(email); // Delete OTP records for the user's email
       return res.status(400).json({ message: "otp expired" });
     }
 
     // now deleting the otp's for the email
-    await UserOTP.deleteMany({
-      email: email,
-    });
+    await deleteOtpByEmail(email);
 
     User.isVerified = true;
     await User.save();
@@ -117,21 +119,17 @@ export const verifyEmail = async (req, res) => {
 export const resendOtpEmail = async (req, res) => {
   try {
     const { email } = req.body;
-    const User = await user.findOne({ email });
-    if (User.length === 0) {
+    const User = await findOneUser({ email });
+    if (!User) {
       return res.status(404).json({ message: "user not found" });
     }
 
     // generating otp
     let OTP = Math.floor(Math.random() * 900000) + 100000;
+
     // add otp to the otp model
-    let otp = new UserOTP({
-      email: email,
-      otp: OTP,
-      createdAt: new Date(),
-      expireAt: new Date(Date.now() + 86400000),
-    });
-    await otp.save();
+    await createOtp(email, OTP);
+
     // calling send mail function
     await sendEmailVerificationOtp(email, OTP, User.name);
 
@@ -147,7 +145,7 @@ export const resendOtpEmail = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const User = await user.findOne({ email });
+    const User = await findOneUser({ email });
     if (!User) {
       return res.status(404).json({ message: "user not found" });
     }
@@ -180,7 +178,7 @@ export const login = async (req, res) => {
         email: User.email,
         role: User.role,
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
     );
 
     //set token as Cookie
@@ -202,7 +200,7 @@ export const verifyLogin = async (req, res) => {
     const { email, otp } = req.body;
 
     // finding user
-    const User = await user.findOne({ email });
+    const User = await findOneUser({ email });
     if (!User) {
       return res
         .status(404)
@@ -217,8 +215,8 @@ export const verifyLogin = async (req, res) => {
     }
 
     // finding otp according to user email
-    const getOtp = await UserOTP.find({ email });
-    if (!getOtp.length === 0) {
+    const getOtp = await findOtpByEmail(email);
+    if (!getOtp) {
       return res.status(404).json({ message: "No OTP records found" });
     }
 
@@ -233,14 +231,12 @@ export const verifyLogin = async (req, res) => {
 
     // check if the time difference is more than 15 minutes (900,000 milliseconds)
     if (timeDifference > 9000000) {
-      await UserOTP.deleteMany({ email: email }); // Delete OTP records for the user's email
+      await deleteOtpByEmail(email); // Delete OTP records for the user's email
       return res.status(400).json({ message: "otp expired" });
     }
 
     // now deleting the otp's for the email
-    await UserOTP.deleteMany({
-      email: email,
-    });
+    await deleteOtpByEmail(email);
 
     // Generating JWT token
     const token = jwt.sign(
@@ -249,7 +245,7 @@ export const verifyLogin = async (req, res) => {
         email: User.email,
         role: User.role,
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
     );
 
     //set token as Cookie
@@ -271,22 +267,18 @@ export const verifyLogin = async (req, res) => {
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const findEmail = await user.findOne({ email: email });
+    const findEmail = await findOneUser({ email: email });
     if (!findEmail) {
       return res
         .status(404)
         .json({ message: `User with the email ${email} not found` });
     }
     let OTP = Math.floor(Math.random() * 900000) + 100000;
-    let otp = new UserOTP({
-      email: email,
-      otp: OTP,
-      createdAt: new Date(),
-      expireAt: new Date(Date.now() + 86400000),
-    });
-    await otp.save();
+
+    await createOtp(email, OTP);
+
     console.log(findEmail.name);
-    await forgotPasswordEmail(email, otp.otp, findEmail.name);
+    await forgotPasswordEmail(email, OTP, findEmail.name);
     res.status(200).json({
       message: "otp sent successfully please verify to reset your password",
     });
@@ -301,7 +293,7 @@ export const forgotPassword = async (req, res) => {
 export const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const User = await user.findOne({ email });
+    const User = await findOneUser({ email });
     if (!User) {
       return res
         .status(404)
@@ -314,8 +306,8 @@ export const verifyOtp = async (req, res) => {
     }
 
     // finding otp according to user email
-    const getOtp = await UserOTP.find({ email });
-    if (!getOtp.length === 0) {
+    const getOtp = await findOtpByEmail(email);
+    if (!getOtp) {
       return res.status(404).json({ message: "No OTP records found" });
     }
 
@@ -330,21 +322,19 @@ export const verifyOtp = async (req, res) => {
 
     // check if the time difference is more than 15 minutes (900,000 milliseconds)
     if (timeDifference > 9000000) {
-      await UserOTP.deleteMany({ email: email }); // Delete OTP records for the user's email
+      await deleteOtpByEmail(email); // Delete OTP records for the user's email
       return res.status(400).json({ message: "otp expired" });
     }
 
     // now deleting the otp's for the email
-    await UserOTP.deleteMany({
-      email: email,
-    });
+    await deleteOtpByEmail(email);
 
     // Generating JWT token
     const token = jwt.sign(
       {
         otpVerified: true,
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
     );
 
     //set token as Cookie
@@ -389,10 +379,9 @@ export const resetPassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const updatedUser = await user.findOneAndUpdate(
+    const updatedUser = await updateUserData(
       { email },
       { $set: { password: hashedPassword } },
-      { new: true }
     );
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -411,7 +400,7 @@ export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
     const body = req.body;
-    const updatedUser = await user.findByIdAndUpdate(id, body, { new: true });
+    const updatedUser = await updateUserData({ _id: id }, body);
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -427,14 +416,14 @@ export const updateUser = async (req, res) => {
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    var findUser = await user.findById(id);
+    var findUser = await findUserById(id);
     if (!findUser) {
       return res.status(404).json({ message: "User not found" });
     }
     if (findUser.courses && findUser.courses.length > 0) {
-      await course.deleteMany({ _id: { $in: findUser.courses } });
+      await deleteManyCoursesByIds(findUser.courses);
     }
-    await user.findByIdAndDelete(id);
+    await deleteUserById(id);
     res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
     res
@@ -446,7 +435,7 @@ export const deleteUser = async (req, res) => {
 // get all users
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await user.find({});
+    const users = await findAllUsers();
     if (users.length === 0) {
       return res.status(404).json({ message: "No records found" });
     }
@@ -462,7 +451,7 @@ export const getAllUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-    const users = await user.findById(id);
+    const users = await findUserById(id);
     if (!users) {
       return res.status(404).json({ message: "No records found" });
     }
@@ -476,11 +465,7 @@ export const getUserById = async (req, res) => {
 
 export const getAllTeachers = async (req, res) => {
   try {
-    const getTeachers = await user
-      .find({
-        courses: { $exists: true, $ne: [] },
-      })
-      .populate("courses");
+    const getTeachers = await findAllTeachers();
     if (getTeachers.length === 0) {
       return res.status(404).json({ message: "no records found" });
     }
