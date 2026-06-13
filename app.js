@@ -25,4 +25,15 @@ app.use("/review", review);
 
 app.get("/", (req, res) => res.status(200).send("Home"));
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    status: 404,
+    method: req.method,
+    path: req.originalUrl,
+  });
+});
+
 export default app;
