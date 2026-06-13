@@ -1,6 +1,6 @@
-import { course } from "../models/course-Management/course.js";
-import user from "../models/user.js";
-import { review } from "../models/reviews.js";
+import { findUserById } from "../repositories/user.js";
+import { findCourseById, updateCourseById } from "../repositories/course.js";
+import { addReview, deleteReviewById, findReviewById } from "../repositories/review.js";
 
 export const createReview = async (req, res) => {
   try {
@@ -10,19 +10,18 @@ export const createReview = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    const findCourse = await course.findById(courseId);
+    const findCourse = await findCourseById(courseId);
     if (!findCourse) {
       return res.status(404).json({ message: "course not found" });
     }
-    const finduser = await user.findById(userId);
+    const finduser = await findUserById(userId);
     if (!finduser) {
       return res.status(404).json({ message: "user not found" });
     }
 
-    const newReview = new review({ courseId, userId, rating, comment });
-    await newReview.save();
+    const newReview = await addReview({ courseId, userId, rating, comment });
 
-    await course.findByIdAndUpdate(findCourse._id, {
+    await updateCourseById(findCourse._id, {
       $push: { reviews: newReview._id },
     });
 
@@ -37,8 +36,9 @@ export const createReview = async (req, res) => {
 export const getReviewsByCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const findReviews = await review.find({ courseId: courseId }).populate("userId");
-    if (findReviews.length < 1) {
+    const findReviews = await findReviewByCourseId(courseId);
+    
+    if (!findReviews) {
       return res.status(404).json({ message: "no reviews found" });
     }
     res.status(200).json(findReviews);
@@ -53,8 +53,8 @@ export const deleteReview = async (req, res) => {
   try {
     const { id, userId } = req.params;
 
-    const findReview = await review.findById(id);
-    const findCourse = await course.findById(findReview.courseId);
+    const findReview = await findReviewById(id);
+    const findCourse = await findCourseById(findReview.courseId);
 
     if (
       findReview.userId.toString() !== userId &&
@@ -65,10 +65,10 @@ export const deleteReview = async (req, res) => {
       });
     }
 
-    await course.findByIdAndUpdate(findReview.courseId, {
+    await updateCourseById(findReview.courseId, {
       $pull: { reviews: id },
     });
-    await review.findByIdAndDelete(id);
+    await deleteReviewById(id);
 
     res.status(200).json({ message: "deleted successfully" });
   } catch (err) {

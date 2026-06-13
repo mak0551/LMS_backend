@@ -3,7 +3,7 @@ import {
   createEnrollment,
   getEnrollmentById,
   getEnrollments,
-  getEnroolledCourses,
+  getEnrolledCourses,
   removeEnrollment,
   updateEnrollment,
 } from "../../controllers/course-Management/enrollment.js";
@@ -16,7 +16,7 @@ router.post("/add", createEnrollment);
 router.get("/getall", getEnrollments);
 router.get("/getbyid/:id", getEnrollmentById);
 router.get("/check", checkEnrollment);
-router.get("/getenrolled-courses/:id", getEnroolledCourses);
+router.get("/getenrolled-courses/:id", getEnrolledCourses);
 
 router.put("/update/:id", updateEnrollment);
 

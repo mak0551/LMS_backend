@@ -1,14 +1,27 @@
-import { course } from "../../models/course-Management/course.js";
-import { module } from "../../models/course-Management/module.js";
-import { review } from "../../models/reviews.js";
-import { enrollMent } from "../../models/course-Management/enrollment.js";
-import user from "../../models/user.js";
-import { populate } from "dotenv";
+import {
+  findTeacherById,
+  findUserById,
+  updateUserData,
+} from "../../repositories/user.js";
+import {
+  addCourse,
+  deleteCourseById,
+  findAllCourses,
+  findCourseById,
+  findCoursesByLevel,
+  updateCourseById,
+} from "../../repositories/course.js";
+import {
+  deleteManyReviewsByCourseId,
+  getAverageRatingsForCourses,
+} from "../../repositories/review.js";
+import { deleteEnrollmentsByCourseId } from "../../repositories/enrollment.js";
+import { deleteModulesByCourseId } from "../../repositories/module.js";
 
 export const createCourse = async (req, res) => {
   try {
     const body = req.body;
-    const findTeacher = await user.findById(body.teacher);
+    const findTeacher = await findUserById(body.teacher);
     // console.log(findTeacher, body.teacher);
     // if (findTeacher.role !== "admin" && findTeacher.role !== "teacher") {
     //   return res.status(400).json({ message: "teacher not found" });
@@ -16,13 +29,12 @@ export const createCourse = async (req, res) => {
     if (!findTeacher) {
       return res.status(404).json({ message: "no records found" });
     }
-    const newCourse = await course.create(body);
-    await user.findByIdAndUpdate(
-      newCourse.teacher,
+    const newCourse = await addCourse(body);
+    await updateUserData(
+      { _id: newCourse.teacher },
       {
         $push: { courses: newCourse._id },
       },
-      { new: true }
     );
     res.status(200).json(newCourse);
   } catch (err) {
@@ -37,19 +49,13 @@ export const getCourse = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const findCourse = await course
-      .findById(id)
-      .populate("teacher module reviews");
+    const findCourse = await findCourseById(id);
     if (!findCourse) {
       return res.status(404).json({ message: "No records found" });
     }
-    const result = await review.aggregate([
-      { $match: { courseId: findCourse._id } },
-      { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
-    ]);
 
-    const averageRating =
-      result.length > 0 ? result[0].averageRating.toFixed(2) : "0.00"; // toFixed(2) gives two two numbers after decimal example 4.23, 0.00, 2.00
+    const averageRating = await getAverageCourseRating(findCourse._id); // toFixed(2) gives two two numbers after decimal example 4.23, 0.00, 2.00
+
     const payload = { findCourse, rating: averageRating };
 
     return res.status(200).json(payload);
@@ -62,20 +68,13 @@ export const getCourse = async (req, res) => {
 
 export const getAllCourses = async (req, res) => {
   try {
-    const findCourse = await course.find({}).populate("teacher");
+    const findCourse = await findAllCourses();
     if (findCourse.length < 1) {
       return res.status(404).json({ message: "No records found" });
     }
-    const ids = findCourse.map((course) => course._id);
+    const courseIds = findCourse.map((course) => course._id);
 
-    const result = await review.aggregate([
-      { $match: { courseId: { $in: ids } } },
-      { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
-    ]);
-
-    const ratingsMap = new Map(
-      result.map((e) => [e._id.toString(), e.averageRating.toFixed(2)])
-    );
+    const ratingsMap = await getAverageRatingsForCourses(courseIds);
 
     const courseWithRatings = findCourse.map((course) => ({
       ...course.toObject(),
@@ -93,35 +92,29 @@ export const getAllCourses = async (req, res) => {
 export const getCoursesByTeacher = async (req, res) => {
   try {
     const { id } = req.params;
-    const findTeacher = await user.findById(id).populate({
-      path: "courses",
-      populate: [
-        { path: "enrolledBy" },
-        {
-          path: "reviews",
-          populate: { path: "userId", select: "name" },
-        },
-      ],
-    });
+
+    const findTeacher = await findTeacherById(id);
     if (!findTeacher) {
       return res.status(404).json({ message: "teacher not found" });
     }
+
     if (!findTeacher.courses || findTeacher.courses.length === 0) {
       return res.status(404).json({
         message: "No courses found for this teacher",
       });
     }
 
-    const ids = findTeacher.courses.map((e) => e._id);
+    const courseIds = findTeacher.courses.map((e) => e._id);
 
-    const result = await review.aggregate([
-      { $match: { courseId: { $in: ids } } },
-      { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
-    ]);
+    const ratingMap = await getAverageRatingsForCourses(courseIds);
+    // const result = await review.aggregate([
+    //   { $match: { courseId: { $in: ids } } },
+    //   { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
+    // ]);
 
-    const ratingMap = new Map(
-      result.map((e) => [e._id.toString(), e.averageRating.toFixed(2)])
-    );
+    // const ratingMap = new Map(
+    //   result.map((e) => [e._id.toString(), e.averageRating.toFixed(2)]),
+    // );
 
     const finalResult = findTeacher.courses.map((course) => ({
       ...course.toObject(),
@@ -139,20 +132,21 @@ export const getCoursesByTeacher = async (req, res) => {
 export const getCoursesByLevel = async (req, res) => {
   try {
     const { level } = req.body;
-    const findCourse = await course.find({ level: level });
+    const findCourse = await findCoursesByLevel(level);
     if (findCourse.length === 0) {
       return res.status(404).json({ message: "No courses found" });
     }
-    const ids = findCourse.map((e) => e._id);
+    const courseIds = findCourse.map((e) => e._id);
 
-    const result = await review.aggregate([
-      { $match: { courseId: { $in: ids } } },
-      { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
-    ]);
+    // const result = await review.aggregate([
+    //   { $match: { courseId: { $in: ids } } },
+    //   { $group: { _id: "$courseId", averageRating: { $avg: "$rating" } } },
+    // ]);
 
-    const ratingMap = new Map(
-      result.map((e) => [e._id.toString(), e.averageRating.toFixed(2)])
-    );
+    // const ratingMap = new Map(
+    //   result.map((e) => [e._id.toString(), e.averageRating.toFixed(2)]),
+    // );
+    const ratingMap = await getAverageRatingsForCourses(courseIds);
 
     const finalResult = findCourse.map((course) => ({
       ...course.toObject(),
@@ -171,9 +165,7 @@ export const updateCourse = async (req, res) => {
   try {
     const { id } = req.params;
     const body = req.body;
-    const updatedCourse = await course.findByIdAndUpdate(id, body, {
-      new: true,
-    });
+    const updatedCourse = await updateCourseById(id, body);
     if (!updatedCourse) {
       return res.status(404).json({ message: "Course not found" });
     }
@@ -190,22 +182,21 @@ export const updateCourse = async (req, res) => {
 export const deleteCourse = async (req, res) => {
   try {
     const { id } = req.params;
-    const findCourse = await course.findById(id);
+    const findCourse = await findCourseById(id);
     if (!findCourse) {
       return res
         .status(404)
         .json({ message: "no course found with the provided ID to delete" });
     }
 
-    await user.findOneAndUpdate(
+    await updateUserData(
       { _id: findCourse.teacher },
       { $pull: { courses: id } },
-      { new: true }
     );
-    await enrollMent.deleteMany({ courseId: findCourse._id });
-    await module.deleteMany({ courseId: findCourse._id });
-    await review.deleteMany({ courseId: findCourse._id });
-    await course.findByIdAndDelete(id);
+    await deleteEnrollmentsByCourseId(findCourse._id);
+    await deleteModulesByCourseId(findCourse._id);
+    await deleteManyReviewsByCourseId({ courseId: findCourse._id });
+    await deleteCourseById(id);
 
     return res.status(200).json({ message: "deleted successfully" });
   } catch (err) {

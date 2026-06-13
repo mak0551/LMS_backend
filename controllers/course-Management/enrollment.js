@@ -1,35 +1,33 @@
-import { course } from "../../models/course-Management/course.js";
-import { enrollMent } from "../../models/course-Management/enrollment.js";
-import user from "../../models/user.js";
+import { findCourseById } from "../../repositories/course.js";
+import {
+  addEnrollment,
+  deleteEnrollment,
+  findAllEnrollments,
+  findEnrollment,
+  findEnrollmentById,
+  findEnrollmentsByStudentId,
+  updateEnrollmentById,
+} from "../../repositories/enrollment.js";
+import { findUserById } from "../../repositories/user.js";
 
 export const createEnrollment = async (req, res) => {
   try {
     const { courseId, studentId } = req.body;
 
-    const userExists = await user.findById(studentId);
+    const userExists = await findUserById(studentId);
     if (!userExists) return res.status(404).json({ message: "User not found" });
 
-    const courseExists = await course.findById(courseId);
+    const courseExists = await findCourseById(courseId);
     if (!courseExists)
       return res.status(404).json({ message: "Course not found" });
 
-    const existingEnrollment = await enrollMent.findOne({
-      courseId: courseId,
-      studentId: studentId,
-    });
+    const existingEnrollment = await findEnrollment(courseId, studentId);
     if (existingEnrollment)
       return res.status(400).json({ message: "User already enrolled" });
 
-    await course.findByIdAndUpdate(
-      courseId,
-      { $push: { enrolledBy: studentId } },
-      { new: true }
-    );
+    await updateCourseById(courseId, { $push: { enrolledBy: studentId } });
 
-    const newEnrollment = await enrollMent.create({
-      courseId: courseId,
-      studentId: studentId,
-    });
+    const newEnrollment = await addEnrollment({ courseId, studentId });
 
     res.status(200).json({
       message: "User enrolled successfully",
@@ -44,7 +42,7 @@ export const createEnrollment = async (req, res) => {
 
 export const getEnrollments = async (req, res) => {
   try {
-    const findEnrollments = await enrollMent.find();
+    const findEnrollments = await findAllEnrollments();
     if (findEnrollments.length === 0) {
       return res.status(404).json({ message: "no records found" });
     }
@@ -59,7 +57,7 @@ export const getEnrollments = async (req, res) => {
 export const getEnrollmentById = async (req, res) => {
   try {
     const { id } = req.params;
-    const findEnrollment = await enrollMent.findById(id);
+    const findEnrollment = await findEnrollmentById(id);
     if (!findEnrollment) {
       return res.status(404).json({ message: "no records found" });
     }
@@ -75,9 +73,8 @@ export const updateEnrollment = async (req, res) => {
   try {
     const { id } = req.params;
     const body = req.body;
-    const updatedEnrollment = await enrollMent.findByIdAndUpdate(id, body, {
-      new: true,
-    });
+
+    const updatedEnrollment = await updateEnrollmentById(id, body);
     if (!updatedEnrollment) {
       return res.status(404).json({ message: "no records found to update" });
     }
@@ -93,16 +90,9 @@ export const removeEnrollment = async (req, res) => {
   try {
     const { courseId, studentId } = req.body;
 
-    await course.findByIdAndUpdate(
-      courseId,
-      { $pull: { enrolledBy: studentId } },
-      { new: true }
-    );
+    await updateCourseById(courseId, { $pull: { enrolledBy: studentId } });
 
-    const enrollment = await enrollMent.findOneAndDelete({
-      courseId: courseId,
-      studentId: studentId,
-    });
+    const enrollment = await deleteEnrollment(courseId, studentId);
 
     if (!enrollment)
       return res.status(404).json({ message: "Enrollment not found" });
@@ -123,10 +113,7 @@ export const checkEnrollment = async (req, res) => {
       return res.status(400).json({ message: "Missing courseId or studentId" });
     }
 
-    const existingEnrollment = await enrollMent.findOne({
-      courseId: courseId,
-      studentId: studentId,
-    });
+    const existingEnrollment = await findEnrollment(courseId, studentId);
 
     res.status(200).json({ isEnrolled: !!existingEnrollment });
   } catch (error) {
@@ -136,20 +123,14 @@ export const checkEnrollment = async (req, res) => {
   }
 };
 
-export const getEnroolledCourses = async (req, res) => {
+export const getEnrolledCourses = async (req, res) => {
   try {
     const { id } = req.params;
-    const findUser = await user.findById(id);
+    const findUser = await findUserById(id);
 
     if (!findUser) return res.status(404).json({ message: "user not found" });
 
-    const getCourses = await enrollMent.find({ studentId: id }).populate({
-      path: "courseId",
-      populate: {
-        path: "teacher",
-        select: "name profileImg"
-      },
-    });
+    const getCourses = await findEnrollmentsByStudentId(id);
 
     if (getCourses.length < 1) {
       return res.status(404).json({ message: "not enrolled in any courses" });

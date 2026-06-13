@@ -17,6 +17,19 @@ export const findAllTeachers = async () => {
   return await user.find({ courses: { $exists: true, $ne: [] } });
 };
 
+export const findTeacherById = async (teacherId) => {
+  return await course.find({ teacher: teacherId }).populate({
+    path: "courses",
+    populate: [
+      { path: "enrolledBy" },
+      {
+        path: "reviews",
+        populate: { path: "userId", select: "name" },
+      },
+    ],
+  });
+};
+
 export const createUser = async (userData) => {
   const newUser = new user(userData);
   return await newUser.save();
