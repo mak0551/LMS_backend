@@ -2,10 +2,10 @@ import { findCourseById } from "../../repositories/course.js";
 import {
   addEnrollment,
   deleteEnrollment,
-  findAllEnrollments,
+  findAllEnrollmentsForStudent,
+  findAllEnrollmentsForTeacher,
   findEnrollment,
   findEnrollmentById,
-  findEnrollmentsByStudentId,
   updateEnrollmentById,
 } from "../../repositories/enrollment.js";
 import { findUserById } from "../../repositories/user.js";
@@ -40,12 +40,54 @@ export const createEnrollment = async (req, res) => {
   }
 };
 
-export const getEnrollments = async (req, res) => {
+export const getEnrollmentsByTeacher = async (req, res) => {
   try {
-    const findEnrollments = await findAllEnrollments();
+    const teacherId = req.params.id;
+    const userId = req.user.id;
+
+    if (teacherId !== userId && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const findTeacher = await findUserById(teacherId);
+    if (!findTeacher) {
+      return res.status(404).json({ message: "teacher not found" });
+    }
+
+    const courses = findTeacher?.courses;
+
+    const findEnrollments = await findAllEnrollmentsForTeacher(courses);
     if (findEnrollments.length === 0) {
       return res.status(404).json({ message: "no records found" });
     }
+
+    res.status(200).json(findEnrollments);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "internal server error", message: err.message });
+  }
+};
+
+export const getEnrollmentsByStudent = async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const userId = req.user.id;
+
+    if (studentId !== userId && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const findStudent = await findUserById(studentId);
+    if (!findStudent) {
+      return res.status(404).json({ message: "student not found" });
+    }
+
+    const findEnrollments = await findAllEnrollmentsForStudent(studentId);
+    if (findEnrollments.length === 0) {
+      return res.status(404).json({ message: "no records found" });
+    }
+
     res.status(200).json(findEnrollments);
   } catch (err) {
     res
@@ -57,10 +99,22 @@ export const getEnrollments = async (req, res) => {
 export const getEnrollmentById = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user.id;
     const findEnrollment = await findEnrollmentById(id);
     if (!findEnrollment) {
       return res.status(404).json({ message: "no records found" });
     }
+
+    if (
+      !findEnrollment?.studentId?.equals(userId) &&
+      !findEnrollment?.courseId?.teacher.equals(userId) &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(403).json({
+        message: "Forbidden. You are not the owner of this enrollment.",
+      });
+    }
+
     res.status(200).json(findEnrollment);
   } catch (err) {
     res
@@ -72,12 +126,16 @@ export const getEnrollmentById = async (req, res) => {
 export const updateEnrollment = async (req, res) => {
   try {
     const { id } = req.params;
-    const body = req.body;
+    const { enrollmentData, status } = req.body;
 
-    const updatedEnrollment = await updateEnrollmentById(id, body);
+    const updatedEnrollment = await updateEnrollmentById(id, {
+      enrollmentData,
+      status,
+    });
     if (!updatedEnrollment) {
       return res.status(404).json({ message: "no records found to update" });
     }
+
     res.status(200).json(updatedEnrollment);
   } catch (err) {
     res
@@ -120,26 +178,5 @@ export const checkEnrollment = async (req, res) => {
     res
       .status(500)
       .json({ message: "internal Server error", error: error.message });
-  }
-};
-
-export const getEnrolledCourses = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const findUser = await findUserById(id);
-
-    if (!findUser) return res.status(404).json({ message: "user not found" });
-
-    const getCourses = await findEnrollmentsByStudentId(id);
-
-    if (getCourses.length < 1) {
-      return res.status(404).json({ message: "not enrolled in any courses" });
-    }
-
-    res.status(200).json(getCourses);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: "internal server error", message: err.message });
   }
 };

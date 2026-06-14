@@ -1,6 +1,11 @@
 import { findUserById } from "../../repositories/user.js";
 import { findCourseById, updateCourseById } from "../../repositories/course.js";
-import { addReview, deleteReviewById, findReviewByCourseId, findReviewById } from "../../repositories/review.js";
+import {
+  addReview,
+  deleteReviewById,
+  findReviewByCourseId,
+  findReviewById,
+} from "../../repositories/review.js";
 
 export const createReview = async (req, res) => {
   try {
@@ -37,7 +42,7 @@ export const getReviewsByCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
     const findReviews = await findReviewByCourseId(courseId);
-    
+
     if (!findReviews) {
       return res.status(404).json({ message: "no reviews found" });
     }
@@ -51,7 +56,8 @@ export const getReviewsByCourse = async (req, res) => {
 
 export const deleteReview = async (req, res) => {
   try {
-    const { id, userId } = req.params;
+    const { id } = req.params;
+    const userId = req.user._id;
 
     const findReview = await findReviewById(id);
     const findCourse = await findCourseById(findReview.courseId);

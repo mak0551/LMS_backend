@@ -5,11 +5,7 @@ export const findEnrollment = async (courseId, studentId) => {
 };
 
 export const findEnrollmentById = async (enrollmentId) => {
-  return await enrollMent.findById(enrollmentId);
-};
-
-export const findEnrollmentsByStudentId = async (studentId) => {
-  return await enrollMent.find({ studentId }).populate({
+  return await enrollMent.findById(enrollmentId).populate({
     path: "courseId",
     populate: {
       path: "teacher",
@@ -18,8 +14,24 @@ export const findEnrollmentsByStudentId = async (studentId) => {
   });
 };
 
-export const findAllEnrollments = async () => {
-  return await enrollMent.find();
+export const findAllEnrollmentsForTeacher = async (courses) => {
+  return await enrollMent.find({ courseId: { $in: courses } }).populate({
+    path: "courseId",
+    populate: {
+      path: "teacher",
+      select: "name profileImg",
+    },
+  });
+};
+
+export const findAllEnrollmentsForStudent = async (studentId) => {
+  return await enrollMent.find({ studentId }).populate({
+    path: "courseId",
+    populate: {
+      path: "teacher",
+      select: "name profileImg",
+    },
+  });
 };
 
 export const addEnrollment = async (enrollmentData) => {

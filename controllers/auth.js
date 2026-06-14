@@ -31,21 +31,37 @@ export const addUser = async (req, res) => {
     // Creating user
     const newUser = await createUser({
       ...req.body,
+      role: "student",
       password: hashedPassword,
     });
 
-    // generating otp
-    let OTP = Math.floor(Math.random() * 900000) + 100000;
+    // // generating otp
+    // let OTP = Math.floor(Math.random() * 900000) + 100000;
 
-    // add otp to the otp model
-    await createOtp(email, OTP);
+    // // add otp to the otp model
+    // await createOtp(email, OTP);
 
-    // calling send mail function
-    await sendEmailVerificationOtp(email, OTP, newUser.name);
+    // // calling send mail function
+    // await sendEmailVerificationOtp(email, OTP, newUser.name);
 
+    // res.status(200).json({
+    //   message:
+    //     "user Created and email sent successfully please verify before logging in",
+    //   user: newUser,
+    // });
+
+    const token = jwt.sign(
+      {
+        id: newUser._id,
+        email: newUser.email,
+        role: newUser.role,
+      },
+      process.env.JWT_SECRET,
+    );
+
+    res.cookie("accessToken", token, { httpOnly: true });
     res.status(200).json({
-      message:
-        "user Created and email sent successfully please verify before logging in",
+      message: "user Created successfully",
       user: newUser,
     });
   } catch (err) {
@@ -146,6 +162,12 @@ export const login = async (req, res) => {
       return res.status(404).json({ message: "user not found" });
     }
 
+    // if (!User.isVerified) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "please verify your email before loggin in" });
+    // }
+
     const checkPassword = await bcrypt.compare(password, User.password);
     if (!checkPassword) {
       return res.status(400).json({ message: "invalid password" });
@@ -180,7 +202,7 @@ export const login = async (req, res) => {
     //set token as Cookie
     res.cookie("accessToken", token, { httpOnly: true });
 
-    await loginSuccessful(email, User.name);
+    // await loginSuccessful(email, User.name);
 
     res.status(200).json({ message: "login successful", token, user: User });
   } catch (err) {

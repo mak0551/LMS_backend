@@ -6,6 +6,6 @@ router.post("/create", createReview);
 
 router.get("/getbycourse/:courseId", getReviewsByCourse);
 
-router.delete("/delete/:id/:userId", deleteReview);
+router.delete("/delete/:id", deleteReview);
 
 export default router;
