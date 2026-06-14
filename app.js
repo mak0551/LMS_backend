@@ -10,6 +10,7 @@ import course from "./routes/course-Management/course.js";
 import module from "./routes/course-Management/module.js";
 import enrollment from "./routes/course-Management/enrollment.js";
 import review from "./routes/review.js";
+import { authenticateToken } from "./middleware/authToken.js";
 // import fileUpload from "./routes/course-Management/upload.js";
 
 const app = express();
@@ -25,6 +26,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/auth", authRouter);
+
+app.use(authenticateToken);
+
 app.use("/users", userRouter);
 app.use("/course", course);
 app.use("/module", module);
