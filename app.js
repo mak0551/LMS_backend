@@ -9,7 +9,7 @@ import userRouter from "./routes/user.js";
 import course from "./routes/course-Management/course.js";
 import module from "./routes/course-Management/module.js";
 import enrollment from "./routes/course-Management/enrollment.js";
-import review from "./routes/review.js";
+import review from "./routes/course-Management/review.js";
 import { authenticateToken } from "./middleware/authToken.js";
 // import fileUpload from "./routes/course-Management/upload.js";
 

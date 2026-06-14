@@ -1,5 +1,5 @@
 import express from "express";
-import { createReview, deleteReview, getReviewsByCourse } from "../controllers/reviews.js";
+import { createReview, deleteReview, getReviewsByCourse } from "../../controllers/course-Management/reviews.js";
 const router = express.Router();
 
 router.post("/create", createReview);

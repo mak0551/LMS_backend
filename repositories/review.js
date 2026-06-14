@@ -1,4 +1,4 @@
-import { review } from "../models/reviews.js";
+import { review } from "../models/course-Management/reviews.js";
 
 export const addReview = async (reviewData) => {
   return await review.create(reviewData);

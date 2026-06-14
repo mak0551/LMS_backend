@@ -1,6 +1,6 @@
-import { findUserById } from "../repositories/user.js";
-import { findCourseById, updateCourseById } from "../repositories/course.js";
-import { addReview, deleteReviewById, findReviewById } from "../repositories/review.js";
+import { findUserById } from "../../repositories/user.js";
+import { findCourseById, updateCourseById } from "../../repositories/course.js";
+import { addReview, deleteReviewById, findReviewByCourseId, findReviewById } from "../../repositories/review.js";
 
 export const createReview = async (req, res) => {
   try {
