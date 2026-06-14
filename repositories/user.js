@@ -1,3 +1,4 @@
+import { course } from "../models/course-Management/course.js";
 import { UserOTP } from "../models/otp.js";
 import user from "../models/user.js";
 

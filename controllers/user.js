@@ -395,6 +395,18 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+// logout user
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("accessToken");
+    res.status(200).json({ message: "Logout successful" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", message: err.message });
+  }
+};
+
 // update user
 export const updateUser = async (req, res) => {
   try {
