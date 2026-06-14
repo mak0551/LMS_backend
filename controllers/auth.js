@@ -59,7 +59,11 @@ export const addUser = async (req, res) => {
       process.env.JWT_SECRET,
     );
 
-    res.cookie("accessToken", token, { httpOnly: true });
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
     res.status(200).json({
       message: "user Created successfully",
       user: newUser,
@@ -200,7 +204,11 @@ export const login = async (req, res) => {
     );
 
     //set token as Cookie
-    res.cookie("accessToken", token, { httpOnly: true });
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     // await loginSuccessful(email, User.name);
 
@@ -267,7 +275,11 @@ export const verifyLogin = async (req, res) => {
     );
 
     //set token as Cookie
-    res.cookie("accessToken", token, { httpOnly: true });
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     await loginSuccessful(email, User.name);
 
@@ -356,7 +368,11 @@ export const verifyOtp = async (req, res) => {
     );
 
     //set token as Cookie
-    res.cookie("accessToken", token, { httpOnly: true });
+    res.cookie("accessToken", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     res
       .status(200)
