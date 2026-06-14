@@ -173,10 +173,17 @@ export const updateCourse = async (req, res) => {
       return res.status(404).json({ message: "user not found, Invalid Token" });
     }
 
-    const authenticateUser = findUser?.courses?.some((courseId) =>
-      courseId.equals(id),
-    );
-    if (!authenticateUser && findUser.role !== "admin") {
+    const findCourse = await findCourseById(id);
+    if (!findCourse) {
+      return res
+        .status(404)
+        .json({ message: "no course found with the provided ID to update" });
+    }
+
+    if (
+      findCourse?.teacher?._id?.toString() !== userId &&
+      findUser.role !== "admin"
+    ) {
       return res
         .status(403)
         .json({ message: "Forbidden. You are not the owner of this course." });
@@ -186,6 +193,7 @@ export const updateCourse = async (req, res) => {
     if (!updatedCourse) {
       return res.status(404).json({ message: "Course not found" });
     }
+
     return res
       .status(200)
       .json({ message: "updated successfully", updatedCourse });
@@ -213,10 +221,10 @@ export const deleteCourse = async (req, res) => {
         .json({ message: "no course found with the provided ID to delete" });
     }
 
-    const authenticateUser = findUser?.courses?.some((courseId) =>
-      courseId.equals(id),
-    );
-    if (!authenticateUser && findUser.role !== "admin") {
+    if (
+      findCourse?.teacher?._id?.toString() !== userId &&
+      findUser.role !== "admin"
+    ) {
       return res
         .status(403)
         .json({ message: "Forbidden. You are not the owner of this course." });
