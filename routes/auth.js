@@ -9,7 +9,7 @@ import {
   verifyEmail,
   verifyLogin,
   verifyOtp,
-} from "../controllers/user.js";
+} from "../controllers/auth.js";
 
 const router = express.Router();
 
