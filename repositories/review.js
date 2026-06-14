@@ -4,8 +4,8 @@ export const addReview = async (reviewData) => {
   return await review.create(reviewData);
 };
 
-export const findReviewByCourseId = async (courseId) => {
-  return await review.findOne({ courseId }).populate("userId");
+export const findReviewsByCourseId = async (courseId) => {
+  return await review.find({ courseId }).populate("userId");
 };
 
 export const findReviewById = async (reviewId) => {

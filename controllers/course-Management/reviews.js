@@ -3,7 +3,7 @@ import { findCourseById, updateCourseById } from "../../repositories/course.js";
 import {
   addReview,
   deleteReviewById,
-  findReviewByCourseId,
+  findReviewsByCourseId,
   findReviewById,
 } from "../../repositories/review.js";
 
@@ -41,9 +41,9 @@ export const createReview = async (req, res) => {
 export const getReviewsByCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const findReviews = await findReviewByCourseId(courseId);
+    const findReviews = await findReviewsByCourseId(courseId);
 
-    if (!findReviews) {
+    if (findReviews.length < 1) {
       return res.status(404).json({ message: "no reviews found" });
     }
     res.status(200).json(findReviews);
