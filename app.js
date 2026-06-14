@@ -30,6 +30,7 @@ app.use("/auth", authRouter);
 app.use(authenticateToken);
 
 app.use("/users", userRouter);
+
 app.use("/course", course);
 app.use("/module", module);
 app.use("/enrollment", enrollment);
