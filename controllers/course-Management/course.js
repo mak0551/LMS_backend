@@ -13,6 +13,7 @@ import {
 } from "../../repositories/course.js";
 import {
   deleteManyReviewsByCourseId,
+  getAverageCourseRating,
   getAverageRatingsForCourses,
 } from "../../repositories/review.js";
 import { deleteEnrollmentsByCourseId } from "../../repositories/enrollment.js";
