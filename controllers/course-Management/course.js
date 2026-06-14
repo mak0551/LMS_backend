@@ -175,7 +175,7 @@ export const updateCourse = async (req, res) => {
     const authenticateUser = findUser?.courses?.some((courseId) =>
       courseId.equals(id),
     );
-    if (!authenticateUser) {
+    if (!authenticateUser && findUser.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Forbidden. You are not the owner of this course." });
@@ -215,7 +215,7 @@ export const deleteCourse = async (req, res) => {
     const authenticateUser = findUser?.courses?.some((courseId) =>
       courseId.equals(id),
     );
-    if (!authenticateUser) {
+    if (!authenticateUser && findUser.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Forbidden. You are not the owner of this course." });
