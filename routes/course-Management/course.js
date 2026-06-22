@@ -19,7 +19,7 @@ router.get("/getbyid/:id", getCourse);
 
 router.get("/getbyteacher/:id", getCoursesByTeacher);
 
-app.use(authenticateToken);
+router.use(authenticateToken);
 
 router.post("/create",authorizationToken ,createCourse);
 
