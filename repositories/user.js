@@ -19,7 +19,7 @@ export const findAllTeachers = async () => {
 };
 
 export const findTeacherById = async (teacherId) => {
-  return await course.find({ teacher: teacherId }).populate({
+  return await user.findById(teacherId).populate({
     path: "courses",
     populate: [
       { path: "enrolledBy" },

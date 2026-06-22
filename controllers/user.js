@@ -44,6 +44,31 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+// get current user
+export const getCurrentUser = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const findUser = await findUserById(req.user.id);
+    if (!findUser) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    const user = findUser.toObject();
+    delete user.password;
+
+    res.status(200).json({ user });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", message: err.message });
+  }
+};
+
 // get all users
 export const getAllUsers = async (req, res) => {
   try {
@@ -51,6 +76,15 @@ export const getAllUsers = async (req, res) => {
     if (users.length === 0) {
       return res.status(404).json({ message: "No records found" });
     }
+
+    // const sanitizedUsers = users.map((user) => {
+    //   const obj = user.toObject();
+    //   delete obj.password;
+    //   return obj;
+    // });
+
+    // res.json(sanitizedUsers);
+
     res.status(200).json(users);
   } catch (err) {
     res
@@ -63,11 +97,13 @@ export const getAllUsers = async (req, res) => {
 export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
-    const users = await findUserById(id);
-    if (!users) {
+    const user = await findUserById(id);
+    if (!user) {
       return res.status(404).json({ message: "No records found" });
     }
-    res.status(200).json(users);
+    const User = user.toObject();
+    delete User.password;
+    res.status(200).json(User);
   } catch (err) {
     res
       .status(500)
