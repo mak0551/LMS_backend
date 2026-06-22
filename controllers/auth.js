@@ -16,6 +16,8 @@ import {
   deleteOtpByEmail,
 } from "../repositories/user.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 // register user
 export const addUser = async (req, res) => {
   try {
@@ -57,13 +59,16 @@ export const addUser = async (req, res) => {
         role: newUser.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "7d" },
     );
 
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProduction, // true on server, false locally
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
+
     res.status(200).json({
       message: "user Created successfully",
       user: newUser,
@@ -201,13 +206,15 @@ export const login = async (req, res) => {
         role: User.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "7d" },
     );
 
     //set token as Cookie
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProduction, // true on server, false locally
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     // await loginSuccessful(email, User.name);
@@ -272,13 +279,15 @@ export const verifyLogin = async (req, res) => {
         role: User.role,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "7d" },
     );
 
     //set token as Cookie
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProduction, // true on server, false locally
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     await loginSuccessful(email, User.name);
@@ -365,13 +374,15 @@ export const verifyOtp = async (req, res) => {
         otpVerified: true,
       },
       process.env.JWT_SECRET,
+      { expiresIn: "7d" },
     );
 
     //set token as Cookie
     res.cookie("accessToken", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProduction, // true on server, false locally
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     res
