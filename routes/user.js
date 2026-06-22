@@ -7,7 +7,12 @@ import {
   getUserById,
   updateUser,
 } from "../controllers/user.js";
+import { authenticateToken } from "../middleware/authToken.js";
 const router = express.Router();
+
+router.get("/getallteachers", getAllTeachers);
+
+app.use(authenticateToken);
 
 router.put("/update/:id", updateUser);
 
@@ -18,7 +23,5 @@ router.get("/getcurrentuser", getCurrentUser);
 router.get("/getall", getAllUsers);
 
 router.get("/getbyid/:id", getUserById);
-
-router.get("/getallteachers", getAllTeachers);
 
 export default router;
