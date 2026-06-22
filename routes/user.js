@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("/getallteachers", getAllTeachers);
 
-app.use(authenticateToken);
+router.use(authenticateToken);
 
 router.put("/update/:id", updateUser);
 
