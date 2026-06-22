@@ -8,18 +8,20 @@ import {
   getCoursesByTeacher,
   updateCourse,
 } from "../../controllers/course-Management/course.js";
-import { authorizationToken } from "../../middleware/authToken.js";
+import { authenticateToken, authorizationToken } from "../../middleware/authToken.js";
 const router = express.Router();
-
-router.post("/create",authorizationToken ,createCourse);
-
-router.get("/getbyid/:id", getCourse);
 
 router.get("/getall", getAllCourses);
 
+router.get("/getbylvl", getCoursesByLevel);
+
+router.get("/getbyid/:id", getCourse);
+
 router.get("/getbyteacher/:id", getCoursesByTeacher);
 
-router.get("/getbylvl", getCoursesByLevel);
+app.use(authenticateToken);
+
+router.post("/create",authorizationToken ,createCourse);
 
 router.put("/update/:id",authorizationToken, updateCourse);
 

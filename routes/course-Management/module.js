@@ -10,13 +10,15 @@ import {
 import { authorizationToken } from "../../middleware/authToken.js";
 const router = express.Router();
 
-router.post("/add", authorizationToken, createModule);
-
 router.get("/getall", getModules);
 
 router.get("/getone/:id", getSingleModule);
 
 router.get("/getbycourse/:id", getModuleByCourse);
+
+app.use(authenticateToken);
+
+router.post("/add", authorizationToken, createModule);
 
 router.put("/update/:id", authorizationToken, updateModule);
 
