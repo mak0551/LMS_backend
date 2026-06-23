@@ -25,13 +25,33 @@ const userSchema = new mongoose.Schema(
     address: { type: String },
     profileImg: {
       type: String,
-      default:
-        "https://cdn-icons-png.flaticon.com/512/12225/12225935.png",
+      default: "https://cdn-icons-png.flaticon.com/512/12225/12225935.png",
     },
     isVerified: { type: Boolean, default: false },
     courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "course" }],
+    instructorDetails: {
+      professionalTitle: {
+        type: String,
+        required: true,
+      },
+      bio: {
+        type: String,
+        required: true,
+      },
+      expertise: [
+        {
+          type: String,
+        },
+      ],
+      experience: {
+        type: Number,
+        default: 0,
+      },
+      linkedinUrl: String,
+      websiteUrl: String,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const user = mongoose.model("user", userSchema);

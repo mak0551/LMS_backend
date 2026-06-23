@@ -5,6 +5,7 @@ import {
   findAllTeachers,
   deleteUserById,
   updateUserData,
+  changeRoleToInstructor,
 } from "../repositories/user.js";
 
 // update user
@@ -21,6 +22,29 @@ export const updateUser = async (req, res) => {
     res
       .status(500)
       .json({ error: "Internal server error", message: err.message });
+  }
+};
+
+export const becomeInstructor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { instructorData } = req.body;
+
+    const findUser = await findUserById(id);
+    if (!findUser) {
+      return res.status(404).json({ message: "user not found" });
+    }
+
+    if (findUser.role === "teacher") {
+      return res.status(400).json({ message: "you are already a instructor" });
+    }
+
+    const updatedUser = await changeRoleToInstructor(id, instructorData);
+    res.status(200).json({ message: "you are now a instructor", updatedUser });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: err.message, message: "Internal server error" });
   }
 };
 
