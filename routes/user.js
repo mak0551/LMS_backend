@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  becomeInstructor,
   deleteUser,
   getAllTeachers,
   getAllUsers,
@@ -15,6 +16,8 @@ router.get("/getallteachers", getAllTeachers);
 router.use(authenticateToken);
 
 router.put("/update/:id", updateUser);
+
+router.put("/become-instructor/:id", becomeInstructor);
 
 router.delete("/delete/:id", deleteUser);
 

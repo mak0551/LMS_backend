@@ -40,6 +40,14 @@ export const updateUserData = async (userData, updateData) => {
   return await user.findOneAndUpdate(userData, updateData, { new: true });
 };
 
+export const changeRoleToInstructor = async (id, instructorData) => {
+  return await user.findByIdAndUpdate(
+    id,
+    { instructorDetails: instructorData, role: "teacher" },
+    { new: true },
+  );
+};
+
 export const deleteUserById = async (userId) => {
   return await user.findByIdAndDelete(userId);
 };
