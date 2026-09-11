@@ -32,11 +32,11 @@ const userSchema = new mongoose.Schema(
     instructorDetails: {
       professionalTitle: {
         type: String,
-        required: true,
+        // required: true,
       },
       bio: {
         type: String,
-        required: true,
+        // required: true,
       },
       expertise: [
         {
