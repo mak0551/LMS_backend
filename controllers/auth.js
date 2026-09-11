@@ -74,9 +74,10 @@ export const addUser = async (req, res) => {
       user: newUser,
     });
   } catch (err) {
+    console.error(err)
     res
       .status(500)
-      .json({ message: "Internal Server Error", error: err.message });
+      .json({ message: "Internal Server sssssssssssssssError", error: err.message });
   }
 };
 
